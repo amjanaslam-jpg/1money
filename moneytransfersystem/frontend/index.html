@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Transfer System</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel (Staff Management) -->
+        <div class="panel left-panel">
+            <h2>Add Staff</h2>
+            <input type="text" id="staffId" placeholder="Enter Staff ID">
+            <input type="text" id="staffName" placeholder="Enter Staff Name">
+            <button onclick="addStaff()">Add Staff</button>
+
+            <h2>Delete Staff</h2>
+            <input type="text" id="deleteStaffId" placeholder="Enter Staff ID to delete">
+            <button onclick="deleteStaff()">Delete Staff</button>
+
+            <h2>Staff Deposit</h2>
+            <input type="text" id="depositStaffId" placeholder="Enter Staff ID">
+            <input type="text" id="depositStaffName" placeholder="Enter Staff Name">
+            <input type="number" id="depositAmount" placeholder="Enter Amount">
+            <label for="depositCurrency">Currency:</label>
+            <select id="depositCurrency">
+                <option value="INR">INR</option>
+                <option value="SAR">SAR</option>
+                <option value="AED">AED</option>
+            </select>
+            <button onclick="addDeposit()">Add Deposit</button>
+
+            <h2>Staff Balance</h2>
+            <p id="staffBalanceDisplay">Balance: 0 INR</p>
+		<h2>Set Conversion Rates</h2>
+	<input type="number" id="sarRate" placeholder="SAR to INR">
+	<input type="number" id="aedRate" placeholder="AED to INR">
+	<input type="number" id="sarToAedRate" placeholder="SAR to AED">
+	<button onclick="setRates()">Set Rates</button>
+
+
+            <h2>Staff Expense</h2>
+            <input type="text" id="expense_staff_id" placeholder="Enter Staff ID">
+            <input type="text" id="staff_name" placeholder="Enter Staff Name">
+            <input type="number" id="expense_amount" placeholder="Enter Amount">
+            <input type="text" id="expense_reason" placeholder="Enter Reason">
+            <button onclick="addExpense()">Add Expense</button>
+
+           <h3>Staff to Staff Transaction</h3>
+<div>
+    <label>Sender Staff ID:</label>
+    <input type="text" id="senderId" onblur="getStaffDetails(this.value, 'senderDetails')">
+    <div id="senderDetails"></div>
+</div>
+
+<div>
+    <label>Receiver Staff ID:</label>
+    <input type="text" id="receiverId" onblur="getStaffDetails(this.value, 'receiverDetails')">
+    <div id="receiverDetails"></div>
+</div>
+
+<div>
+    <label>Amount:</label>
+    <input type="number" id="transferAmount">
+</div>
+
+<div>
+    <label>Sender Currency:</label>
+    <select id="sendCurrency">
+        <option value="INR">INR</option>
+        <option value="AED">AED</option>
+        <option value="SAR">SAR</option>
+    </select>
+</div>
+
+<div>
+    <label>Receiver Currency:</label>
+    <select id="receiveCurrency">
+        <option value="INR">INR</option>
+        <option value="AED">AED</option>
+        <option value="SAR">SAR</option>
+    </select>
+</div>
+
+<div>
+    <label>Description:</label>
+    <textarea id="description"></textarea>
+</div>
+
+<button onclick="staffToStaffTransaction()">Send</button>
+
+
+            <h3>Search Staff Expenses</h3>
+            <input type="text" id="search_staff_name" placeholder="Enter Staff Name" />
+            <button onclick="searchExpense()">SEARCH EXPENSE</button>
+            <div id="expense_result"></div>
+        </div>
+
+        <!-- Right Panel (Money Transfer & Transactions) -->
+        <div class="panel right-panel">
+           <h2>Money Transfer</h2>
+<!-- Currency Rate Display -->
+<div style="text-align: right; font-weight: bold; color: #333; margin-bottom: 10px;">
+    <span id="currencyRates">💱 Latest Rates: Loading...</span>
+</div>
+
+<input type="text" id="transferStaffId" placeholder="Enter Staff ID" oninput="fetchStaffDetails('transferStaffId', 'transferStaffName')">
+<input type="text" id="transferStaffName" placeholder="Staff Name" readonly>
+<input type="text" id="customerName" placeholder="Enter Customer Name" list="customerSuggestions">
+<datalist id="customerSuggestions"></datalist>
+
+<input type="number" id="amountSent" placeholder="Amount Sent (INR)">
+
+<div style="display:flex; gap:5px;">
+    <input type="number" id="receivedMoney" placeholder="Amount Received">
+    <select id="receivedCurrency">
+        <option value="INR">INR</option>
+        <option value="AED">AED</option>
+        <option value="SAR">SAR</option>
+    </select>
+</div>
+
+<select id="sendCountry" onchange="convertAmount()">
+    <option value="SAR">Saudi Riyal (SAR)</option>
+    <option value="AED">UAE Dirham (AED)</option>
+</select>
+<input type="number" id="convertedCurrency" placeholder="Converted Amount" readonly>
+<input type="datetime-local" id="transferDate" placeholder="Select Transaction Date (optional)">
+
+<!-- ✅ NEW DESCRIPTION BOX -->
+<div class="form-group">
+    <label for="transferDescription">Description</label>
+    <textarea id="transferDescription" placeholder="Enter transaction description..." rows="3"></textarea>
+</div>
+
+<button onclick="sendMoney()">Send Money</button>
+
+
+            <h3>Transactions</h3>
+            <input type="date" id="fromDate" placeholder="From Date">
+            <input type="date" id="toDate" placeholder="To Date">
+
+            <input type="text" id="searchInput" placeholder="Search by Staff ID or Customer Name">
+            <button onclick="searchTransaction()">Search</button>
+            <button onclick="exportCSV()">Export to Excel</button>
+
+            <!-- ✅ Corrected Transactions Table -->
+            <!-- ✅ Corrected Transactions Table -->
+<table>
+    <thead>
+        <tr>
+            <th>Staff ID</th>
+            <th>Staff Name</th>
+            <th>Customer Name</th>
+            <th>Amount Sent (INR)</th>
+            <th>Received</th>
+            <th>Converted</th>
+            <th>Currency Value</th> <!-- ✅ FIXED -->
+            <th>Sent To</th>
+            <th>Customer Balance</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="transactionsTable"></tbody>
+</table>
+
+
+        </div>
+    </div>
+
+    <!-- Search Result Modal -->
+    <div id="searchResultModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Search Results</h2>
+            <div id="searchResultsContainer"></div> 
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Search Staff Expense Modal -->
+    <div id="searchExpenseModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Staff Expense Details</h2>
+            <div id="expenseResultsContainer">
+                <table id="expensetable">
+                    <thead>
+                        <tr>
+                            <th>Staff ID</th>
+                            <th>Staff Name</th>
+                            <th>Amount</th>
+                            <th>Reason</th>
+                            <th>Date</th>
+			    <th>Deducted From</th>   <!-- 🟢 NEW -->
+       			    <th>Currency</th>        <!-- 🟢 NEW -->
+
+                        </tr>
+                    </thead>
+                    <tbody id="expenseTableBody"></tbody>
+                </table>
+            </div>
+            <button onclick="closeExpenseModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Search Staff Deposit Modal -->
+    <div id="searchDepositModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Staff Deposit Details</h2>
+            <div id="depositResultsContainer">
+                <table id="deposittable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Staff ID</th>
+                            <th>Staff Name</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th>Deposited By</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="depositTableBody"></tbody>
+                </table>
+            </div>
+            <button onclick="closeDepositModal()">Close</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
